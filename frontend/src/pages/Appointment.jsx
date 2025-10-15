@@ -4,6 +4,7 @@ import { AppContext } from '../context/AppContext'
 import { assets } from '../assets/assets'
 import RelatedDoctors from '../components/RelatedDoctors'
 import { toast } from 'react-toastify'
+import axios from 'axios'
 
 const Appointment = () => {
 
@@ -75,9 +76,14 @@ const Appointment = () => {
       return navigate('/login')
     }
 
+    if (!slotTime) {
+      toast.error("Please select a time slot");
+      return;
+    }
+
     try {
 
-      const data = docSlots[slotIndex][0].datetime
+      const date = docSlots[slotIndex][0].datetime
 
       let day = date.getDate()
       let month = date.getMonth() + 1
@@ -85,10 +91,20 @@ const Appointment = () => {
 
       const slotDate = day + "_" + month + "_" + year  
       
-      console.log(slotDate);
-      
+      const { data } = await axios.post(backendUrl + '/api/user/book-appointment',{docId, slotDate, slotTime}, {headers:{token}})
+      if (data.success) {
+        toast.success(data.message)
+        getDoctorsData()
+        navigate('/my-appointments')
+      } else {
+
+        toast.error(data.message)
+
+      }
+    
     } catch (error) {
-      
+      console.log(error)
+      toast.error(error.message)  
     }
   }
 
