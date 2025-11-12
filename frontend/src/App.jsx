@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Routes,Route } from 'react-router-dom';
 import Home from './pages/Home';
 import Doctors from './pages/Doctors';
@@ -11,11 +11,28 @@ import Appointment from './pages/Appointment';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
  import { ToastContainer, toast } from 'react-toastify';
+import PreLoader from './components/PreLoader';
 
 
 const App = () => {
+
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setLoading(true);
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [location.pathname]);
+
   return (
-    <div className='mx-4 lg:mx-[10%]'>  
+    <div className='mx-4 lg:mx-[10%]'> 
+    {loading ? (
+        <PreLoader />
+      ) : (
+        <> 
       <ToastContainer />
       <Navbar />
       <Routes>
@@ -31,6 +48,8 @@ const App = () => {
       
       </Routes>
       <Footer />
+      </>
+      )}
     </div>
   )
 }
